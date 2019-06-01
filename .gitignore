@@ -1,0 +1,13 @@
+# ignore everything
+*
+# do not ignore files with extensions
+!*.*
+# do not ignore directories
+!*/
+
+!makefile
+*.o
+
+# ignore emacs autosave files (#filename#)
+\#*\#
+
