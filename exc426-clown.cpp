@@ -28,6 +28,7 @@ using namespace std;
 
 // Globals.
 static float angle = 0.0; // Rotation.angle of hat.
+static float yRotation = 30;
 static int isAnimate = 0; // Animated?
 static int animationPeriod = 50; // Time interval between frames.
 
@@ -42,7 +43,7 @@ void drawScene(void)
    glLineWidth(1);
    // Place scene in frustum.
    glTranslatef(0.0, 0.0, -9.0);
-   glRotatef(30, 0, 1, 0);
+   glRotatef(yRotation, 0, 1, 0);
    
    // Head.
    glColor3f(0.0, 0.0, 1.0);
@@ -83,6 +84,25 @@ void drawScene(void)
    glColor3f(1.0, 0.0, 0.0);
    glutWireSphere(0.5, 10, 10);
    glPopMatrix();
+
+   // left eye
+   glPushMatrix();
+   glTranslatef(0.5 + s / 5, 1 + cos(angle*(PI/180)) / 5, sqrt(4 - 1 - 0.25)); // i hope this is calculated in compile-time
+   glRotatef(angle * 3, 0, 0, 1);
+
+   glColor3f(0.5, 1.0, 1.0);
+   glutWireSphere(0.4, 10, 10);
+   glPopMatrix();
+   
+   // right eye
+   glPushMatrix();
+   glTranslatef(-0.5 - s / 5, 1 + cos(angle*(PI/180)) / 5, sqrt(4 - 1 - 0.25)); // i hope this is calculated in compile-time
+   glRotatef(-angle * 3, 0, 0, 1);
+
+   glColor3f(0.5, 1.0, 1.0);
+   glutWireSphere(0.4, 10, 10);
+   glPopMatrix();
+   
 
    glPushMatrix();
    // transformations for the nose
@@ -183,7 +203,15 @@ void keyInput(unsigned char key, int x, int y)
       case 27:
          exit(0);
          break;
-	  case ' ': 
+   case 'y':
+     yRotation += 5;
+     if (yRotation > 360) yRotation -= 360;
+     break;
+   case 'Y':
+     yRotation -= 5;
+     if (yRotation < 360) yRotation += 360;
+     break;
+   case ' ': 
          if (isAnimate) isAnimate = 0;
 		 else 
 		 {
