@@ -1,5 +1,5 @@
 //
-// Draws a ball sliding on an inclined surface
+// Draws a ball sliding on an inclined surface. World units are in meter, g = 9.8.
 //
 // Notes: surface is drawn using a vbo and display list. I could have created the
 // vbo for only one line and then translated it in display list to draw other lines.
@@ -64,20 +64,23 @@ void createDispList()
 
 void display()
 {
+  float ballDistance = (g * seconds * seconds / 2.0) * cos(inclineAngle * PI / 180);
   glClear(GL_COLOR_BUFFER_BIT);
   glLoadIdentity();
   
-  glTranslatef(0, 0, -60);
+  glTranslatef(0, 0, -50);
   glRotatef(60, 0, -1, 0);
 
   // draw the surface
   glColor3f(0, 0, 0);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glPushMatrix();
   glRotatef(90 - inclineAngle, -1, 0, 0);
   glCallList(plane);
-  glPopMatrix();
-  
+
+  glTranslatef(0, 30 - ballDistance, 3); // slide
+  glRotatef(ballDistance / 3 * 180/PI, 1, 0, 0); // roll (arclength/radius gives angle in radians)
+  glColor3f(1, 0, 0);
+  glutWireSphere(3, 10, 10);
   
   glutSwapBuffers();
 }
