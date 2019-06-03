@@ -64,7 +64,7 @@ void createDispList()
 
 void display()
 {
-  float ballDistance = (g * seconds * seconds / 2.0) * cos(inclineAngle * PI / 180);
+  float ballDistance = (g * seconds * seconds / 2.0) * sin(inclineAngle * PI / 180);
   glClear(GL_COLOR_BUFFER_BIT);
   glLoadIdentity();
   
@@ -133,11 +133,16 @@ void keyboard(unsigned char key, int x, int y)
 
 void special(int key, int x, int y)
 {
-  /*  switch (key)
+  switch (key)
     {
-    case GLUT_KEY_DOWN:
+    case GLUT_KEY_UP:
+      inclineAngle += 5;
       break;
-    } */
+    case GLUT_KEY_DOWN:
+      inclineAngle -= 5;
+      break;
+    }
+  glutPostRedisplay();
 }
 
 void reshape(int w, int h)
