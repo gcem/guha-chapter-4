@@ -29,7 +29,10 @@ unsigned int vao;
 unsigned int buf;
 unsigned int plane;
 float inclineAngle = 30; // degrees
+float inclineSecondPlane = 20; // relative to first plane
 float g = 9.8; // gravitational acceleration
+int onFirstPlane = 1;
+float timeDiff; // time of changing to second plane, in seconds
 
 void fillVertices()
 {
@@ -64,24 +67,51 @@ void createDispList()
 
 void display()
 {
-  float ballDistance = (g * seconds * seconds / 2.0) * sin(inclineAngle * PI / 180);
+  float ballDistance, ballDistanceSecond;
   glClear(GL_COLOR_BUFFER_BIT);
   glLoadIdentity();
   
-  glTranslatef(0, 0, -50);
+  glTranslatef(30, 0, -70);
   glRotatef(60, 0, -1, 0);
 
-  // draw the surface
+  // draw first plane
   glColor3f(0, 0, 0);
   glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
   glRotatef(90 - inclineAngle, -1, 0, 0);
   glCallList(plane);
 
-  glTranslatef(0, 30 - ballDistance, 3); // slide
-  glRotatef(ballDistance / 3 * 180/PI, 1, 0, 0); // roll (arclength/radius gives angle in radians)
-  glColor3f(1, 0, 0);
-  glutWireSphere(3, 10, 10);
+  // second plane
+  glPushMatrix();
+  glTranslatef(0, -30, 0);
+  glRotatef(inclineSecondPlane, -1, 0, 0);
+  glTranslatef(0, -30, 0);
+  glCallList(plane);
+  glPopMatrix();
   
+  if (onFirstPlane)
+    {
+      ballDistance =  (g * seconds * seconds / 2.0) * sin(inclineAngle * PI / 180);
+      if (ballDistance > 60) {onFirstPlane = 0; timeDiff = seconds;}
+      else
+	{
+	  glTranslatef(0, 30 - ballDistance, 5); // slide
+	  glRotatef(ballDistance / 3 * 180/PI, 1, 0, 0); // roll
+	        // (arclength/radius gives angle in radians)
+	  glutWireSphere(5, 10, 10);
+	}
+    }
+  if (!onFirstPlane)
+    {
+      glTranslatef(0, -30, 0); // move to the bottom of the first plane
+      ballDistanceSecond = g * timeDiff * sin(inclineAngle * PI / 180) * (seconds - timeDiff) +
+	g * (seconds-timeDiff) * (seconds-timeDiff) / 2 * sin((inclineAngle-inclineSecondPlane) * PI/180);
+      glRotatef(inclineSecondPlane, -1, 0, 0);
+      glTranslatef(0, -ballDistanceSecond, 3);
+      glRotatef(ballDistance / 3 * 180/PI - inclineSecondPlane, 1, 0, 0); // rotation after first plane
+      glRotatef(ballDistanceSecond / 3 * 180/PI, 1, 0, 0); // roll on second plane
+    }
+  glColor3f(1, 0, 0);
+  glutWireSphere(5, 10, 10);
   glutSwapBuffers();
 }
 
@@ -123,6 +153,7 @@ void keyboard(unsigned char key, int x, int y)
       isAnimating = 0;
       frame = 0;
       seconds = 0;
+      onFirstPlane = 1;
       glutPostRedisplay();
       break;
     case 27:
