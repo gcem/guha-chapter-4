@@ -1,8 +1,14 @@
 //
 // Draws a ball sliding on an inclined surface. World units are in meter, g = 9.8.
+// Ball can roll back but doesn't climb on first plane after touching second plane.
 //
 // Notes: surface is drawn using a vbo and display list. I could have created the
 // vbo for only one line and then translated it in display list to draw other lines.
+//
+// Interaction:
+// space: start/stop animation
+// up/down: change the incline of both planes
+// right-left: change the incline of second plane relative to first
 //
 
 #include <cstdlib>
@@ -171,6 +177,13 @@ void special(int key, int x, int y)
       break;
     case GLUT_KEY_DOWN:
       inclineAngle -= 5;
+      break;
+    case GLUT_KEY_RIGHT:
+      inclineSecondPlane -= 5;
+      if (inclineSecondPlane < 0) inclineSecondPlane = 0;
+      break;
+    case GLUT_KEY_LEFT:
+      inclineSecondPlane += 5;
       break;
     }
   glutPostRedisplay();
